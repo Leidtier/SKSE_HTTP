@@ -14,6 +14,11 @@ namespace SKSE_HTTP_TypedDictionary
     float getFloat(int object, std::string key, float defaultValue);
     bool getBool(int object, std::string key, bool defaultValue);
     int getNestedDictionary(int object, std::string key, int defaultValue);
+    std::vector<std::string> getStringArray(int object, std::string key);
+    std::vector<int> getIntArray(int object, std::string key);
+    std::vector<float> getFloatArray(int object, std::string key);
+    std::vector<bool> getBoolArray(int object, std::string key);
+    std::vector<int> getArrayOfNestedDictionaries(int object, std::string key);
 
     // Inserts @key: @value pair. Replaces existing pair with the same @key
 
@@ -22,6 +27,11 @@ namespace SKSE_HTTP_TypedDictionary
     void setFloat(int object, std::string key, float value);
     void setBool(int object, std::string key, bool value);
     void setNestedDictionary(int object, std::string key, int value);
+    void setStringArray(int object, std::string key, std::vector<std::string> value);
+    void setIntArray(int object, std::string key, std::vector<int> value);
+    void setFloatArray(int object, std::string key, std::vector<float> value);
+    void setBoolArray(int object, std::string key, std::vector<bool> value);
+    void setArrayOfNestedDictionaries(int object, std::string key, std::vector<int> value);
 
     //  Returns true, if the container has @key: value pair
     bool hasKey(int object, std::string key);

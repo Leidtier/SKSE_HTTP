@@ -22,7 +22,7 @@
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
       },
       "environment": {
-        "SKYRIM_MODS_FOLDER": "<Put your Path to your MO2 mods folder here>" 
+        "SKYRIM_MODS_FOLDER": "C:/Users/TK/AppData/Local/ModOrganizer/Skyrim Special Edition Development/mods" 
       }
     },
     {

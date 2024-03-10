@@ -44,6 +44,37 @@ namespace SKSE_HTTP_TypedDictionary
         return defaultValue;
     };
 
+    std::vector<std::string> getStringArray(int object, std::string key){
+        if(dicNestedDictionariesValues.contains(object) && dicNestedDictionariesValues[object]->hasElement(key)){
+            return dicNestedDictionariesValues[object]->getStringArray(key);
+        }
+        return std::vector<std::string>();
+    };
+    std::vector<int> getIntArray(int object, std::string key){
+        if(dicNestedDictionariesValues.contains(object) && dicNestedDictionariesValues[object]->hasElement(key)){
+            return dicNestedDictionariesValues[object]->getIntArray(key);
+        }
+        return std::vector<int>();
+    };
+    std::vector<float> getFloatArray(int object, std::string key){
+        if(dicNestedDictionariesValues.contains(object) && dicNestedDictionariesValues[object]->hasElement(key)){
+            return dicNestedDictionariesValues[object]->getFloatArray(key);
+        }
+        return std::vector<float>();
+    };
+    std::vector<bool> getBoolArray(int object, std::string key){
+        if(dicNestedDictionariesValues.contains(object) && dicNestedDictionariesValues[object]->hasElement(key)){
+            return dicNestedDictionariesValues[object]->getBoolArray(key);
+        }
+        return std::vector<bool>();
+    };
+    std::vector<int> getArrayOfNestedDictionaries(int object, std::string key){
+        if(dicNestedDictionariesValues.contains(object) && dicNestedDictionariesValues[object]->hasElement(key)){
+            return dicNestedDictionariesValues[object]->getArrayOfNestedDictionaries(key);
+        }
+        return std::vector<int>();
+    };
+
     // Inserts @key: @value pair. Replaces existing pair with the same @key
 
     void setString(int object, std::string key, std::string value){
@@ -67,6 +98,26 @@ namespace SKSE_HTTP_TypedDictionary
             dicNestedDictionariesValues[object]->setNestedDictionary(key, value);
     }
 
+    void setStringArray(int object, std::string key, std::vector<std::string> value){
+        if(dicNestedDictionariesValues.contains(object))
+            dicNestedDictionariesValues[object]->setStringArray(key, value);
+    }
+    void setIntArray(int object, std::string key, std::vector<int> value){
+        if(dicNestedDictionariesValues.contains(object))
+            dicNestedDictionariesValues[object]->setIntArray(key, value);
+    }
+    void setFloatArray(int object, std::string key, std::vector<float> value){
+        if(dicNestedDictionariesValues.contains(object))
+            dicNestedDictionariesValues[object]->setFloatArray(key, value);
+    }
+    void setBoolArray(int object, std::string key, std::vector<bool> value){
+        if(dicNestedDictionariesValues.contains(object))
+            dicNestedDictionariesValues[object]->setBoolArray(key, value);
+    }
+    void setArrayOfNestedDictionaries(int object, std::string key, std::vector<int> value){
+        if(dicNestedDictionariesValues.contains(object))
+            dicNestedDictionariesValues[object]->setArrayOfNestedDictionaries(key, value);
+    }
     //  Returns true, if the container has @key: value pair
     bool hasKey(int object, std::string key){
         if(dicNestedDictionariesValues.contains(object) && dicNestedDictionariesValues[object]->hasElement(key))

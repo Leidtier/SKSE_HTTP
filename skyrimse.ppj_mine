@@ -11,9 +11,11 @@
     Final="false">
     <Variables>
         <!-- Set the name of your mod: -->
-        <Variable Name="ModName" Value="SKSE_HTTP" />
+        <Variable Name="ModName" Value="SKSE_HTTP" />        
+        <!-- Path to where your Skyrim game folder is -->   
+        <Variable Name="GameFolder" Value="H:\Spiele\Steam\steamapps\common\Skyrim Special Edition" />
         <!-- The folder where you store all of your mods -->
-        <Variable Name="ModsFolder" Value="<Put your MO2 mods folder here>" />
+        <Variable Name="ModsFolder" Value="C:\Users\TK\AppData\Local\ModOrganizer\Skyrim Special Edition Development\mods" />
     </Variables>
     <Imports>
         <!-- <Import>@ModsFolder\SKSE64\Scripts\Source</Import> -->

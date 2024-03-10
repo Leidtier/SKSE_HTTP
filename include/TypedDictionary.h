@@ -67,6 +67,56 @@ namespace SKSE_HTTP_TypedDictionary
             std::string getTypeName() override;
     };
 
+    class TypedValueStringArray : public TypedValue{
+        private:
+            std::vector<std::string> _value;    
+        
+        public:
+            TypedValueStringArray(std::vector<std::string> value);
+            std::vector<std::string> getValue();
+            std::string getTypeName() override;
+
+    };
+
+    class TypedValueIntArray : public TypedValue{
+        private:
+            std::vector<int> _value;
+        
+        public:
+            TypedValueIntArray(std::vector<int> value);
+            std::vector<int> getValue();
+            std::string getTypeName() override;
+    };
+
+    class TypedValueFloatArray : public TypedValue{
+        private:
+            std::vector<float> _value;
+
+        public:
+            TypedValueFloatArray(std::vector<float> value);
+            std::vector<float> getValue();
+            std::string getTypeName() override;
+    };
+
+    class TypedValueBoolArray : public TypedValue{
+        private:
+            std::vector<bool> _value;
+
+        public:
+            TypedValueBoolArray(std::vector<bool> value);
+            std::vector<bool> getValue();
+            std::string getTypeName() override;
+    };
+
+    class TypedValueNestedDictionaryArray : public TypedValue{
+        private:
+            std::vector<int> _value;
+        
+        public:
+            TypedValueNestedDictionaryArray(std::vector<int> value);
+            std::vector<int> getValue();
+            std::string getTypeName() override;
+    };
 
     class TypedDictionary
     {
@@ -79,6 +129,12 @@ namespace SKSE_HTTP_TypedDictionary
             void setFloat(std::string name, float value);
             void setBool(std::string name, bool value);
             void setNestedDictionary(std::string name, int id);
+            void setStringArray(std::string name, std::vector<std::string> value);
+            void setIntArray(std::string name, std::vector<int> value);
+            void setFloatArray(std::string name, std::vector<float> value);
+            void setBoolArray(std::string name, std::vector<bool> value);
+            void setArrayOfNestedDictionaries(std::string name, std::vector<int> value);
+            
 
             bool hasElement(std::string name);
 
@@ -87,5 +143,11 @@ namespace SKSE_HTTP_TypedDictionary
             float getFloat(std::string name);
             bool getBool(std::string name);
             int getNestedDictionary(std::string name);
+            std::vector<std::string> getStringArray(std::string name);
+            std::vector<int> getIntArray(std::string name);
+            std::vector<float> getFloatArray(std::string name);
+            std::vector<bool> getBoolArray(std::string name);
+            std::vector<int> getArrayOfNestedDictionaries(std::string name);
+            
     };
 }
