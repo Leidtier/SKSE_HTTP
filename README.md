@@ -9,13 +9,13 @@ A SKSE plugin to connect to a local http server and exchange strongly typed JSON
     - [x] float
     - [x] bool
     - [x] nested dictionaries
-    - [ ] arrays
+    - [x] arrays
 - [x] Serialize and deserialize typed dictionary to and from JSON
-- static link all the dependencies so that they don't have to sit in Skyrim's main directory
+- [x] static link all the dependencies so that they don't have to sit in Skyrim's main directory
     - [ ] libcurl
     - [ ] cpr
     - [x] nlohmann/json
-- Make sure this works on
+- [x] Make sure this works on
     - [ ] Skyrim SE (I assume this works, but untested)
     - [x] Skyrim AE
     - [x] Skyrim VR
