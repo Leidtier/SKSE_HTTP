@@ -12,8 +12,8 @@ A SKSE plugin to connect to a local http server and exchange strongly typed JSON
     - [x] arrays
 - [x] Serialize and deserialize typed dictionary to and from JSON
 - [x] static link all the dependencies so that they don't have to sit in Skyrim's main directory
-    - [ ] libcurl
-    - [ ] cpr
+    - [x] libcurl
+    - [x] cpr
     - [x] nlohmann/json
 - [x] Make sure this works on
     - [ ] Skyrim SE (I assume this works, but untested)
