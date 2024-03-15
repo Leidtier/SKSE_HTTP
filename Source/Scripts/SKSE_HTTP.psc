@@ -1,9 +1,17 @@
 scriptName SKSE_HTTP hidden
 
-function sendLocalhostHttpRequest(int typedDictionaryHandle, int port, string route) global native
+function sendLocalhostHttpRequest(int typedDictionaryHandle, int port, string route, int timeout = 0) global native
 
 function raiseOnHttpReplyReceived(int typedDictionaryHandle) global
     int handle = ModEvent.Create("SKSE_HTTP_OnHttpReplyReceived")
+    if (handle)
+        ModEvent.PushInt(handle, typedDictionaryHandle)
+        ModEvent.Send(handle)
+    endIf    
+endFunction
+
+function raiseOnHttpErrorReceived(int typedDictionaryHandle) global
+    int handle = ModEvent.Create("SKSE_HTTP_OnHttpErrorReceived")
     if (handle)
         ModEvent.PushInt(handle, typedDictionaryHandle)
         ModEvent.Send(handle)

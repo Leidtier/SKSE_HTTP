@@ -6,9 +6,6 @@
 using json = nlohmann::json;
 using namespace SKSE_HTTP_TypedDictionary;
 
-std::ostringstream os;
-bool resultAlreadySent = false;
-
 void toLowerCase(std::string* input) {
     std::transform(input->begin(), input->end(), input->begin(), [](unsigned char c) { return std::tolower(c); });
 };
@@ -103,52 +100,45 @@ int generateDictionaryFromJson(json jsonToUse)
     return handle;
 };
 
-bool writeCallback(std::string data, intptr_t userdata)
-{
-    os << data;
-    return true;
-};
-
-int sendHttpRequestResultToSkyrimEvent(std::string completeReply)
-{
+int sendHttpRequestResultToSkyrimEvent(std::string completeReply, RE::BSFixedString papyrusFunctionToCall) {
     json reply = json::parse(completeReply);
     int newHandle = generateDictionaryFromJson(reply);
-    // int newHandle = 1;
     auto* vm = RE::BSScript::Internal::VirtualMachine::GetSingleton();
     auto eventArgs = RE::MakeFunctionArguments((int)newHandle);
     RE::BSTSmartPointer<RE::BSScript::IStackCallbackFunctor> callback;
-    RE::BSFixedString Skse_Http = "SKSE_HTTP";
-    RE::BSFixedString OnHttpReplyReceived = "raiseOnHttpReplyReceived";
-    vm->DispatchStaticCall(Skse_Http, OnHttpReplyReceived, eventArgs, callback);
+    RE::BSFixedString Skse_Http = "SKSE_HTTP";    
+    vm->DispatchStaticCall(Skse_Http, papyrusFunctionToCall, eventArgs, callback);
     return 0;
 };
 
-bool progressCallback(cpr::cpr_off_t downloadTotal, cpr::cpr_off_t downloadNow, cpr::cpr_off_t uploadTotal, cpr::cpr_off_t uploadNow, intptr_t userdata)
-{
-    if (!resultAlreadySent && downloadTotal > 0 && downloadNow == downloadTotal)
+void postCallbackMethod(cpr::Response response)
+{ 
+    if (response.status_code == 200)
     {
-        sendHttpRequestResultToSkyrimEvent(os.str());
-        resultAlreadySent = true;
+        RE::BSFixedString onHttpReplyReceived = "raiseOnHttpReplyReceived";
+        sendHttpRequestResultToSkyrimEvent(response.text, onHttpReplyReceived);
     }
-    return true;
-};
+    else
+    {
+        json jsonToUse;
+        jsonToUse["SKSE_HTTP_error"] = response.error.message;
+        RE::BSFixedString onHttpErrorReceived = "raiseOnHttpErrorReceived";
+        sendHttpRequestResultToSkyrimEvent(jsonToUse.dump(), onHttpErrorReceived);
+    }
+}
 
-void sendLocalhostHttpRequest(RE::StaticFunctionTag*, int typedDictionaryHandle, int port, std::string route)
+void sendLocalhostHttpRequest(RE::StaticFunctionTag*, int typedDictionaryHandle, int port, std::string route, int timeout)
 {
     json newJson = getJsonFromHandle(typedDictionaryHandle);
     std::string textToSend = newJson.dump();
-    // std::string textToSend = "Hello";
-	std::string url = "http://localhost:" + std::to_string(port) + "/" + route;
-    resultAlreadySent = false;
-    os.str("");
-    os.clear();
-    cpr::PostAsync(cpr::Url{ url },
-            cpr::ProgressCallback{ progressCallback },
-            cpr::WriteCallback{ writeCallback },
-            cpr::Authentication{ "user", "pass", cpr::AuthMode::BASIC },
-            cpr::Header{{"Content-Type", "application/json"}},
-            cpr::Header{{"accept", "application/json"}},
-            cpr::Body{textToSend});
+    std::string url = "http://localhost:" + std::to_string(port) + "/" + route;
+    cpr::PostCallback(postCallbackMethod,
+                        cpr::Url{url},
+                        cpr::ConnectTimeout {timeout},
+                        cpr::Authentication{"user", "pass", cpr::AuthMode::BASIC},
+                        cpr::Header{{"Content-Type", "application/json"}}, 
+                        cpr::Header{{"accept", "application/json"}},
+                        cpr::Body{textToSend});
 };
 
 int createDictionaryRelay(RE::StaticFunctionTag*) { return createDictionary(); };
@@ -289,13 +279,6 @@ bool Bind(RE::BSScript::IVirtualMachine* vm) {
 
 SKSEPluginLoad(const SKSE::LoadInterface* skse) {
     SKSE::Init(skse);
-    // We need to do *something* in the game to activate our "MessageBox" and "Notification".
-    // This registers an "EventHandler" to handle whenever any object in the game is "Activated".
-    // If the *player* activated the object, the name of the activated object is passed to OnPlayerActivateItem() above.
-    // If you are curious about the event handler, see EventHandler.h
-    // But you can also see more examples of game event handlers in the template:
-    //                                                       https://github.com/SkyrimScripting/SKSE_Template_GameEvents
     SKSE::GetPapyrusInterface()->Register(Bind);
-    // SKSE::GetPapyrusInterface()->Register(BindTypedDictionary);
     return true;
 };
