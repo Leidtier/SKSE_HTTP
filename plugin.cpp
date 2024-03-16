@@ -141,6 +141,8 @@ void sendLocalhostHttpRequest(RE::StaticFunctionTag*, int typedDictionaryHandle,
                         cpr::Body{textToSend});
 };
 
+void clearAllDictionaries(RE::StaticFunctionTag*) { clearAll(); };
+
 int createDictionaryRelay(RE::StaticFunctionTag*) { return createDictionary(); };
 
 // Returns the value associated with the @key. If not, returns @default value
@@ -250,6 +252,7 @@ bool Bind(RE::BSScript::IVirtualMachine* vm) {
     vm->RegisterFunction("sendLocalhostHttpRequest", className, sendLocalhostHttpRequest);
 
     vm->RegisterFunction("createDictionary", className, createDictionaryRelay);
+    vm->RegisterFunction("clearAllDictionaries", className, clearAllDictionaries);
 
     vm->RegisterFunction("getString", className, getStringRelay);
     vm->RegisterFunction("getInt", className, getIntRelay);

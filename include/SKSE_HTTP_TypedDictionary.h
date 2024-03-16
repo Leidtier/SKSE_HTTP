@@ -7,6 +7,7 @@ namespace SKSE_HTTP_TypedDictionary
     extern int counter;
 
     int createDictionary();
+    void clearAll();
 
     // Returns the value associated with the @key. If not, returns @default value
     std::string getString(int object, std::string key, std::string defaultValue);

@@ -21,6 +21,7 @@ endFunction
 ; Dictionary
 
 Int function createDictionary() global native
+function clearAllDictionaries() global native
 
 ;/  Returns the value associated with the @key. If not, returns @default value
 /;
