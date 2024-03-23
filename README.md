@@ -1,5 +1,7 @@
 # SKSE HTTP
-A SKSE plugin to connect to a local http server and exchange strongly typed JSON data with it from Papyrus
+A SKSE plugin to connect to a local http server and exchange strongly typed JSON data with it from Papyrus  
+
+The Fallout 4 version of the plugin can be found here: https://github.com/Leidtier/F4SE_HTTP
 
 ## Status
 - [x] Call http server and receive reply
@@ -16,11 +18,9 @@ A SKSE plugin to connect to a local http server and exchange strongly typed JSON
     - [x] cpr
     - [x] nlohmann/json
 - [x] Make sure this works on
-    - [ ] Skyrim SE (I assume this works, but untested)
+    - [x] Skyrim SE
     - [x] Skyrim AE
     - [x] Skyrim VR
-    - [ ] Fallout 4
-    - [ ] Fallout VR
 
 ## Usage
 Create a strongly typed dictionary from Papyrus and send it as json to a local http server.  
