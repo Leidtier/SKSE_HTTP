@@ -129,6 +129,7 @@ void postCallbackMethod(cpr::Response response)
 
 void sendLocalhostHttpRequest(RE::StaticFunctionTag*, int typedDictionaryHandle, int port, std::string route, int timeout)
 {
+    toLowerCase(&route);
     json newJson = getJsonFromHandle(typedDictionaryHandle);
     std::string textToSend = newJson.dump();
     std::string url = "http://localhost:" + std::to_string(port) + "/" + route;
@@ -187,7 +188,6 @@ std::vector<int> getNestedDictionariesArrayRelay(RE::StaticFunctionTag*, int obj
     return getArrayOfNestedDictionaries(object, key);
 };
 
-// Inserts @key: @value pair. Replaces existing pair with the same @key
 
 void setStringRelay(RE::StaticFunctionTag*, int object, std::string key, std::string value) {
     toLowerCase(&key);
@@ -210,35 +210,50 @@ void setNestedDictionaryRelay(RE::StaticFunctionTag*, int object, std::string ke
     setNestedDictionary(object, key, value);
 };
 void setStringArrayRelay(RE::StaticFunctionTag*, int object, std::string key,
-                         const RE::reference_array<std::string> value) {
+                         const std::vector< std::string > value) {
     toLowerCase(&key);
     std::vector<std::string> vector;
-    for (int i = 0; i < value.size(); ++i) vector.push_back(value[i]);
+    try {
+        for (int i = 0; i < value.size(); ++i) vector.push_back(value[i]);
+    } catch (...) {
+    }
     setStringArray(object, key, vector);
 };
-void setIntArrayRelay(RE::StaticFunctionTag*, int object, std::string key, const RE::reference_array<int> value) {
+void setIntArrayRelay(RE::StaticFunctionTag*, int object, std::string key, const std::vector<int> value) {
     toLowerCase(&key);
     std::vector<int> vector;
-    for (int i = 0; i < value.size(); ++i) vector.push_back(value[i]);
+    try {
+        for (int i = 0; i < value.size(); ++i) vector.push_back(value[i]);
+    } catch (...) {
+    }
     setIntArray(object, key, vector);
 };
-void setFloatArrayRelay(RE::StaticFunctionTag*, int object, std::string key, const RE::reference_array<float> value) {
+void setFloatArrayRelay(RE::StaticFunctionTag*, int object, std::string key, const std::vector<float> value) {
     toLowerCase(&key);
     std::vector<float> vector;
-    for (int i = 0; i < value.size(); ++i) vector.push_back(value[i]);
+    try {
+        for (int i = 0; i < value.size(); ++i) vector.push_back(value[i]);
+    } catch (...) {
+    }
     setFloatArray(object, key, vector);
 };
 void setBoolArrayRelay(RE::StaticFunctionTag*, int object, std::string key, std::vector<bool> value) {
     toLowerCase(&key);
     std::vector<bool> vector;
-    for (int i = 0; i < value.size(); ++i) vector.push_back(value[i]);
+    try {
+        for (int i = 0; i < value.size(); ++i) vector.push_back(value[i]);
+    } catch (...) {
+    }
     setBoolArray(object, key, vector);
 };
 void setNestedDictionariesArrayRelay(RE::StaticFunctionTag*, int object, std::string key,
-                                       const RE::reference_array<int> value) {
+                                     const std::vector<int> value) {
     toLowerCase(&key);
     std::vector<int> vector;
-    for (int i = 0; i < value.size(); ++i) vector.push_back(value[i]);
+    try {
+        for (int i = 0; i < value.size(); ++i) vector.push_back(value[i]);
+    } catch (...) {
+    }
     setArrayOfNestedDictionaries(object, key, vector);
 };
 
