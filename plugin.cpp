@@ -14,39 +14,37 @@ json getJsonFromHandle(int typedDictionaryHandle)
 {
     std::shared_ptr<TypedDictionary> dict = SKSE_HTTP_TypedDictionary::dicNestedDictionariesValues[typedDictionaryHandle];
     json jsonToUse;
-    for (auto& [key, value]: dict->_dicElements)
-    {
-        std::string valueType = value->getTypeName();
-        if (valueType == "string")
-            jsonToUse[key] = dict->getString(key);
-        else if (valueType == "int")
-            jsonToUse[key] = dict->getInt(key);
-        else if (valueType == "float")
-            jsonToUse[key] = dict->getFloat(key);
-        else if (valueType == "bool")
-            jsonToUse[key] = dict->getBool(key);
-        else if (valueType == "stringArray")
-            jsonToUse[key] = dict->getStringArray(key);
-        else if (valueType == "intArray")
-            jsonToUse[key] = dict->getIntArray(key);
-        else if (valueType == "floatArray")
-            jsonToUse[key] = dict->getFloatArray(key);
-        else if (valueType == "boolArray")
-            jsonToUse[key] = dict->getBoolArray(key);
-        else if (valueType == "NestedDictionary")
-        {
-            int handle = dict->getNestedDictionary(key);
-            jsonToUse[key] = getJsonFromHandle(handle);
-        }
-        else if (valueType == "NestedDictionaryArray")
-        {
-            std::vector<int> handles = dict->getArrayOfNestedDictionaries(key);
-            auto jsonObjects = json::array();
-            size_t sizeOfHandles = handles.size();
-            for (auto i = 0; i < sizeOfHandles; ++i) {
-                jsonObjects.push_back(getJsonFromHandle(handles[i]));
+    if (dict) {
+        for (auto& [key, value] : dict->_dicElements) {
+            std::string valueType = value->getTypeName();
+            if (valueType == "string")
+                jsonToUse[key] = dict->getString(key);
+            else if (valueType == "int")
+                jsonToUse[key] = dict->getInt(key);
+            else if (valueType == "float")
+                jsonToUse[key] = dict->getFloat(key);
+            else if (valueType == "bool")
+                jsonToUse[key] = dict->getBool(key);
+            else if (valueType == "stringArray")
+                jsonToUse[key] = dict->getStringArray(key);
+            else if (valueType == "intArray")
+                jsonToUse[key] = dict->getIntArray(key);
+            else if (valueType == "floatArray")
+                jsonToUse[key] = dict->getFloatArray(key);
+            else if (valueType == "boolArray")
+                jsonToUse[key] = dict->getBoolArray(key);
+            else if (valueType == "NestedDictionary") {
+                int handle = dict->getNestedDictionary(key);
+                jsonToUse[key] = getJsonFromHandle(handle);
+            } else if (valueType == "NestedDictionaryArray") {
+                std::vector<int> handles = dict->getArrayOfNestedDictionaries(key);
+                auto jsonObjects = json::array();
+                size_t sizeOfHandles = handles.size();
+                for (auto i = 0; i < sizeOfHandles; ++i) {
+                    jsonObjects.push_back(getJsonFromHandle(handles[i]));
+                }
+                jsonToUse[key] = jsonObjects;
             }
-            jsonToUse[key] = jsonObjects;
         }
     }
     return jsonToUse;
