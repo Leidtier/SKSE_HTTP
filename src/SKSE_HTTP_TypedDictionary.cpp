@@ -13,12 +13,15 @@ namespace SKSE_HTTP_TypedDictionary
     };
 
     void clearAll() {
-        for (auto& [key, value] : dicNestedDictionariesValues) {
-            if (value) {
-                value.reset();
+        try {
+            for (auto& [key, value] : dicNestedDictionariesValues) {
+                if (value) {
+                    value.reset();
+                }
             }
+            dicNestedDictionariesValues.clear();
+        } catch (...){
         }
-        dicNestedDictionariesValues.clear(); 
     };
 
     // Returns the value associated with the @key. If not, returns @default value

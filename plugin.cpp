@@ -10,6 +10,16 @@ void toLowerCase(std::string* input) {
     std::transform(input->begin(), input->end(), input->begin(), [](unsigned char c) { return std::tolower(c); });
 };
 
+bool test_utf8(std::string input) {
+    try {
+        json test = {"test", input};
+        test.dump();
+        return true;
+    } catch (...) {
+        return false;
+    }
+};
+
 json getJsonFromHandle(int typedDictionaryHandle)
 {
     std::shared_ptr<TypedDictionary> dict = SKSE_HTTP_TypedDictionary::dicNestedDictionariesValues[typedDictionaryHandle];
@@ -99,14 +109,18 @@ int generateDictionaryFromJson(json jsonToUse)
 };
 
 int sendHttpRequestResultToSkyrimEvent(std::string completeReply, RE::BSFixedString papyrusFunctionToCall) {
-    json reply = json::parse(completeReply);
-    int newHandle = generateDictionaryFromJson(reply);
-    auto* vm = RE::BSScript::Internal::VirtualMachine::GetSingleton();
-    auto eventArgs = RE::MakeFunctionArguments((int)newHandle);
-    RE::BSTSmartPointer<RE::BSScript::IStackCallbackFunctor> callback;
-    RE::BSFixedString Skse_Http = "SKSE_HTTP";    
-    vm->DispatchStaticCall(Skse_Http, papyrusFunctionToCall, eventArgs, callback);
-    return 0;
+    try {
+        json reply = json::parse(completeReply);
+        int newHandle = generateDictionaryFromJson(reply);
+        auto* vm = RE::BSScript::Internal::VirtualMachine::GetSingleton();
+        auto eventArgs = RE::MakeFunctionArguments((int)newHandle);
+        RE::BSTSmartPointer<RE::BSScript::IStackCallbackFunctor> callback;
+        RE::BSFixedString Skse_Http = "SKSE_HTTP";
+        vm->DispatchStaticCall(Skse_Http, papyrusFunctionToCall, eventArgs, callback);
+        return 0;
+    } catch (...) {
+        return 1;
+    }
 };
 
 void postCallbackMethod(cpr::Response response)
@@ -127,17 +141,20 @@ void postCallbackMethod(cpr::Response response)
 
 void sendLocalhostHttpRequest(RE::StaticFunctionTag*, int typedDictionaryHandle, int port, std::string route, int timeout)
 {
-    toLowerCase(&route);
-    json newJson = getJsonFromHandle(typedDictionaryHandle);
-    std::string textToSend = newJson.dump();
-    std::string url = "http://localhost:" + std::to_string(port) + "/" + route;
-    cpr::PostCallback(postCallbackMethod,
-                        cpr::Url{url},
-                        cpr::ConnectTimeout {timeout},
-                        cpr::Authentication{"user", "pass", cpr::AuthMode::BASIC},
-                        cpr::Header{{"Content-Type", "application/json"}}, 
-                        cpr::Header{{"accept", "application/json"}},
-                        cpr::Body{textToSend});
+    try {
+        toLowerCase(&route);
+        auto start_jsonfromhandle = std::chrono::steady_clock::now();
+        json newJson = getJsonFromHandle(typedDictionaryHandle);
+        auto start_send = std::chrono::steady_clock::now();
+        std::string textToSend = newJson.dump();
+        std::string url = "http://localhost:" + std::to_string(port) + "/" + route;
+        cpr::PostCallback(postCallbackMethod, cpr::Url{url}, cpr::ConnectTimeout{timeout},
+                          cpr::Authentication{"user", "pass", cpr::AuthMode::BASIC},
+                          cpr::Header{{"Content-Type", "application/json"}},
+                          cpr::Header{{"accept", "application/json"}}, cpr::Body{textToSend});
+    } catch (...) {
+    
+    }
 };
 
 void clearAllDictionaries(RE::StaticFunctionTag*) { clearAll(); };
@@ -187,9 +204,11 @@ std::vector<int> getNestedDictionariesArrayRelay(RE::StaticFunctionTag*, int obj
 };
 
 
-void setStringRelay(RE::StaticFunctionTag*, int object, std::string key, std::string value) {
+bool setStringRelay(RE::StaticFunctionTag*, int object, std::string key, std::string value) {
     toLowerCase(&key);
+    if (!test_utf8(value)) return false;
     setString(object, key, value);
+    return true;
 };
 void setIntRelay(RE::StaticFunctionTag*, int object, std::string key, int value) {
     toLowerCase(&key);
@@ -207,15 +226,23 @@ void setNestedDictionaryRelay(RE::StaticFunctionTag*, int object, std::string ke
     toLowerCase(&key);
     setNestedDictionary(object, key, value);
 };
-void setStringArrayRelay(RE::StaticFunctionTag*, int object, std::string key,
+bool setStringArrayRelay(RE::StaticFunctionTag*, int object, std::string key,
                          const std::vector< std::string > value) {
     toLowerCase(&key);
     std::vector<std::string> vector;
+    bool result = true;
     try {
-        for (int i = 0; i < value.size(); ++i) vector.push_back(value[i]);
-    } catch (...) {
+        for (int i = 0; i < value.size(); ++i) {
+            if (test_utf8(value[i])) {
+                vector.push_back(value[i]);
+            } else {
+                result = false;
+            }
+        }
+    } catch (...) {        
     }
     setStringArray(object, key, vector);
+    return true;
 };
 void setIntArrayRelay(RE::StaticFunctionTag*, int object, std::string key, const std::vector<int> value) {
     toLowerCase(&key);
