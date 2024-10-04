@@ -57,3 +57,9 @@ Bool function hasKey(Int object, String key) global native
     0 - no value, 1 - none, 2 - int, 3 - float, 4 - form, 5 - object, 6 - string
 /;
 Int function valueType(Int object, String key) global native
+
+Function TakeScreenshot() global native
+Function RenameScreenshot(String filename) global native
+VoiceType Function GetVoiceType(Actor actor) global native
+Function SetVoiceType(Actor actor, VoiceType voice) global native
+

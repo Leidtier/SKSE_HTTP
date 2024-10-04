@@ -2,9 +2,29 @@
 #include <cpr\cpr.h>
 #include <SKSE_HTTP_TypedDictionary.h>
 #include <nlohmann\json.hpp>
+#include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/sinks/msvc_sink.h>
+
 
 using json = nlohmann::json;
 using namespace SKSE_HTTP_TypedDictionary;
+
+
+void InitializeLogging() {
+    std::filesystem::path path("C:/Users/Pierre/Documents/My Games/Skyrim Special Edition/SKSE/SKSE_HTTP.log");
+
+
+    auto sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(path.string(), true);
+    std::shared_ptr<spdlog::logger> log = std::make_shared<spdlog::logger>("global log"s, std::move(sink));
+
+    //log = std::make_shared<spdlog::logger>("Global", std::make_shared<spdlog::sinks::basic_file_sink_mt>(path->string(), true));
+    log->set_level(spdlog::level::trace);
+    log->flush_on(spdlog::level::trace);
+
+    spdlog::set_default_logger(std::move(log));
+    spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%n] [%l] [%t] [%s:%#] %v");
+    //spdlog::set_pattern("[%T.%e] [%=5t] [%L] %v"s);
+    }
 
 void toLowerCase(std::string* input) {
     std::transform(input->begin(), input->end(), input->begin(), [](unsigned char c) { return std::tolower(c); });
@@ -283,6 +303,62 @@ void setNestedDictionariesArrayRelay(RE::StaticFunctionTag*, int object, std::st
 };
 
 
+void TakeScreenShot(RE::StaticFunctionTag* ) {
+    INPUT keyEvent[2];
+    WORD wkey = 0x2C;               // Prtscreen
+
+    SKSE::log::info("Screenshot");
+    keyEvent[0].type = INPUT_KEYBOARD;
+    keyEvent[0].ki.wVk = 0;
+    keyEvent[0].ki.dwFlags = 0;
+    keyEvent[0].ki.time = 0;
+    keyEvent[0].ki.dwExtraInfo = GetMessageExtraInfo();
+    keyEvent[0].ki.wScan = (WORD)0xb7;
+    UINT ret = SendInput(1, keyEvent, sizeof(INPUT));
+
+     Sleep(20);
+
+    keyEvent[0].type = INPUT_KEYBOARD;
+    keyEvent[0].ki.wVk = 0;
+    keyEvent[0].ki.dwFlags = KEYEVENTF_KEYUP;
+    keyEvent[0].ki.time = 0;
+    keyEvent[0].ki.dwExtraInfo = GetMessageExtraInfo();
+    keyEvent[0].ki.wScan = (WORD)0xb7;
+    ret = SendInput(1, keyEvent, sizeof(INPUT));
+    }
+
+void RenameScreenshot(RE::StaticFunctionTag*, std::string newname) {
+    RE::INISettingCollection* ini = RE::INIPrefSettingCollection::GetSingleton();
+    RE::Setting *ssIndex = ini->GetSetting("iScreenShotIndex:Display");
+    char exe_path[_MAX_PATH];
+
+    if (ssIndex != nullptr) {
+        int SSidx = ssIndex->GetUInt() - 1;
+
+        GetModuleFileNameA(NULL, exe_path, _MAX_PATH);			// Skyrim exe
+        std::filesystem::path app_path(exe_path);
+        std::filesystem::path base_path(app_path.remove_filename());
+
+        std::filesystem::path src_path(base_path / std::format("ScreenShot{:d}.png", SSidx));
+        std::filesystem::path dst_path(base_path / newname);
+        DeleteFile(dst_path.c_str());
+
+        MoveFile(src_path.c_str(), dst_path.c_str());
+        }
+    }
+
+RE::BGSVoiceType* GetVoiceType(RE::StaticFunctionTag*, RE::Actor* actor) {
+    RE::TESActorBase* actorBase = actor->GetActorBase();
+    RE::BGSVoiceType* voiceType = actorBase->voiceType;
+
+    return voiceType;
+    }
+
+void SetVoiceType(RE::StaticFunctionTag*, RE::Actor* actor, RE::BGSVoiceType* voice) {
+    RE::TESActorBase* actorBase = actor->GetActorBase();
+    actorBase->voiceType = voice;
+    }
+
 //  Returns true, if the container has @key: value pair
 bool hasKeyRelay(RE::StaticFunctionTag*, int object, std::string key) { return hasKey(object, key); };
 
@@ -315,6 +391,10 @@ bool Bind(RE::BSScript::IVirtualMachine* vm) {
     vm->RegisterFunction("setFloatArray", className, setFloatArrayRelay);
     vm->RegisterFunction("setBoolArray", className, setBoolArrayRelay);
     vm->RegisterFunction("setNestedDictionariesArray", className, setNestedDictionariesArrayRelay);
+    vm->RegisterFunction("TakeScreenShot", className, TakeScreenShot);
+    vm->RegisterFunction("GetVoiceType", className, GetVoiceType);
+    vm->RegisterFunction("SetVoiceType", className, SetVoiceType);
+    vm->RegisterFunction("RenameScreenshot", className, RenameScreenshot);
 
     vm->RegisterFunction("hasKey", className, hasKeyRelay);
     return true;
@@ -322,6 +402,7 @@ bool Bind(RE::BSScript::IVirtualMachine* vm) {
 
 SKSEPluginLoad(const SKSE::LoadInterface* skse) {
     SKSE::Init(skse);
+    InitializeLogging();
     SKSE::GetPapyrusInterface()->Register(Bind);
     return true;
 };
