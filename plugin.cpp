@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <Shlobj.h>
 #include <cpr\cpr.h>
 #include <SKSE_HTTP_TypedDictionary.h>
 #include <nlohmann\json.hpp>
@@ -11,7 +12,13 @@ using namespace SKSE_HTTP_TypedDictionary;
 
 
 void InitializeLogging() {
-    std::filesystem::path path("C:/Users/Pierre/Documents/My Games/Skyrim Special Edition/SKSE/SKSE_HTTP.log");
+
+    WCHAR userpath[MAX_PATH];
+    SHGetFolderPathW(NULL, CSIDL_MYDOCUMENTS, NULL, 0, userpath);
+
+    // Force proper path, otherwise the files end up in 'Skyrim.INI/SKSE'
+    std::filesystem::path path(userpath);
+    path /= "Skyrim Special Edition/SKSE/SKSE_HTTP.log";
 
 
     auto sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(path.string(), true);
@@ -402,7 +409,7 @@ bool Bind(RE::BSScript::IVirtualMachine* vm) {
 
 SKSEPluginLoad(const SKSE::LoadInterface* skse) {
     SKSE::Init(skse);
-    InitializeLogging();
+    //InitializeLogging();
     SKSE::GetPapyrusInterface()->Register(Bind);
     return true;
 };
