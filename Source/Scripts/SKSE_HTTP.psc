@@ -62,4 +62,5 @@ Function TakeScreenshot() global native
 Function RenameScreenshot(String filename) global native
 VoiceType Function GetVoiceType(Actor actor) global native
 Function SetVoiceType(Actor actor, VoiceType voice) global native
-
+VoiceType Function GetRaceDefaultVoiceType(Actor actor) global native
+Function SetRaceDefaultVoiceType(Actor actor, VoiceType voice) global native

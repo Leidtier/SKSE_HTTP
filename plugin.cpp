@@ -359,12 +359,38 @@ RE::BGSVoiceType* GetVoiceType(RE::StaticFunctionTag*, RE::Actor* actor) {
     RE::BGSVoiceType* voiceType = actorBase->voiceType;
 
     return voiceType;
-    }
+}
 
 void SetVoiceType(RE::StaticFunctionTag*, RE::Actor* actor, RE::BGSVoiceType* voice) {
     RE::TESActorBase* actorBase = actor->GetActorBase();
     actorBase->voiceType = voice;
+}
+
+RE::BGSVoiceType* GetRaceDefaultVoiceType(RE::StaticFunctionTag*, RE::Actor* actor) {
+    try {
+        if (actor->GetActorBase()->GetSex() == RE::SEX::kMale) {
+            RE::BGSVoiceType* voiceType = actor->GetRace()->defaultVoiceTypes[0];
+            return voiceType;
+        } else {
+            RE::BGSVoiceType* voiceType = actor->GetRace()->defaultVoiceTypes[1];
+            return voiceType;
+        }
+    } catch (...) {
+        RE::TESActorBase* actorBase = actor->GetActorBase();
+        RE::BGSVoiceType* voiceType = actorBase->voiceType;
+        return voiceType;
     }
+}
+
+void SetRaceDefaultVoiceType(RE::StaticFunctionTag*, RE::Actor* actor, RE::BGSVoiceType* voice) {
+    try {
+        if (actor->GetActorBase()->GetSex() == RE::SEX::kMale)
+            actor->GetRace()->defaultVoiceTypes[0] = voice;
+        else
+            actor->GetRace()->defaultVoiceTypes[1] = voice;
+    } catch (...) {      
+    }   
+}
 
 //  Returns true, if the container has @key: value pair
 bool hasKeyRelay(RE::StaticFunctionTag*, int object, std::string key) { return hasKey(object, key); };
@@ -402,6 +428,8 @@ bool Bind(RE::BSScript::IVirtualMachine* vm) {
     vm->RegisterFunction("GetVoiceType", className, GetVoiceType);
     vm->RegisterFunction("SetVoiceType", className, SetVoiceType);
     vm->RegisterFunction("RenameScreenshot", className, RenameScreenshot);
+    vm->RegisterFunction("GetRaceDefaultVoiceType", className, GetRaceDefaultVoiceType);
+    vm->RegisterFunction("SetRaceDefaultVoiceType", className, SetRaceDefaultVoiceType);
 
     vm->RegisterFunction("hasKey", className, hasKeyRelay);
     return true;
